@@ -103,7 +103,42 @@ function Landing() {
   // claim state
   const [claimOpen, setClaimOpen] = useState(false);
   const [claimEmail, setClaimEmail] = useState('');
-  const [claimStatus, setClaimStatus] = useState<null | 'ok' | 'dup' | 'limit' | 'error'>(null);
+  const onClaim = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (claimBusyRef.current) return;
+  claimBusyRef.current = true;
+  setClaimStatus(null);
+  try {
+    const res = await fetch('/api/puzzle/claim', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: claimEmail,
+        proof: 'HOME',
+        letters: Array.from(found),
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data?.ok) {
+      setClaimStatus('ok');
+      try { localStorage.setItem(STORAGE_CLAIMED, claimEmail); } catch {}
+    } else {
+      // map reasons to UI statuses
+      const reason = data?.reason;
+      if (reason === 'email') setClaimStatus('dup');
+      else if (reason === 'ip') setClaimStatus('ip');
+      else if (reason === 'rate') setClaimStatus('rate');
+      else if (res.status === 429) setClaimStatus('limit');
+      else if (reason === 'disposable') setClaimStatus('disposable');
+      else setClaimStatus('error');
+    }
+  } catch {
+    setClaimStatus('error');
+  } finally {
+    claimBusyRef.current = false;
+  }
+};
+
   const claimBusyRef = useRef(false);
 
   // newsletter (local confirm only for now)
