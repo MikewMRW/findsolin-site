@@ -441,9 +441,15 @@ setClaimOpen(false);
       {/* Riddle modal */}
       <Modal
         open={riddleOpen && !solved}
-        onClose={() => setRiddleOpen(false)}
-        title="System unlocked → One last question"
-      >
+        <Modal
+  open={claimOpen}
+  onClose={() => {
+    try { localStorage.setItem('fs_claim_dismissed', '1'); } catch {}
+    setClaimOpen(false);
+  }}
+  title="Claim your reward"
+>
+
         <p className="text-sm text-zinc-300">
           You found all four signals. Enter the final answer to proceed.
         </p>
