@@ -6,9 +6,6 @@ import Link from 'next/link';
 import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-
-
-
 /* --------------------- tiny UI helpers --------------------- */
 function Toast({ message }: { message: string | null }) {
   if (!message) return null;
@@ -49,13 +46,6 @@ function Modal({
             aria-label="Close"
             className="rounded-md px-2 py-1 text-zinc-400 hover:bg-white/5 hover:text-white"
           >
-            <button
-  onClick={() => setClaimOpen(true)}
-  className="rounded-xl border border-white/20 px-6 py-3 font-medium hover:bg-white/5"
->
-  Claim reward
-</button>
-
             ✕
           </button>
         </div>
@@ -90,8 +80,6 @@ export default function Page() {
 function Landing() {
   const search = useSearchParams();
   const debug = useMemo(() => search.get('debug') === '1', [search]);
-  const [claimedEmail, setClaimedEmail] = useState<string | null>(null);
-
 
   // puzzle state
   const [found, setFound] = useState<FoundSet>(new Set<string>());
@@ -103,58 +91,10 @@ function Landing() {
   // claim state
   const [claimOpen, setClaimOpen] = useState(false);
   const [claimEmail, setClaimEmail] = useState('');
-  const onClaim = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (claimBusyRef.current) return;
-  claimBusyRef.current = true;
-  setClaimStatus(null);
-  try {
-    const res = await fetch('/api/puzzle/claim', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: claimEmail,
-        proof: 'HOME',
-        letters: Array.from(found),
-      }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (res.ok && data?.ok) {
-      setClaimStatus('ok');
-      try { localStorage.setItem(STORAGE_CLAIMED, claimEmail); } catch {}
-    } else {
-      // map reasons to UI statuses
-      const reason = data?.reason;
-      if (reason === 'email') setClaimStatus('dup');
-      else if (reason === 'ip') setClaimStatus('ip');
-      else if (reason === 'rate') setClaimStatus('rate');
-      else if (res.status === 429) setClaimStatus('limit');
-      else if (reason === 'disposable') setClaimStatus('disposable');
-      else setClaimStatus('error');
-    }
-  } catch {
-    setClaimStatus('error');
-  } finally {
-    claimBusyRef.current = false;
-  }
-    {claimStatus === 'ip' && (
-  <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-300">
-    A reward was already claimed from this connection.
-  </div>
-)}
-{claimStatus === 'rate' && (
-  <div className="mt-3 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-300">
-    Too many attempts right now. Please try again later.
-  </div>
-)}
-{claimStatus === 'disposable' && (
-  <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-300">
-    Disposable email addresses aren’t allowed. Please use a regular email.
-  </div>
-)}
-
-};
-
+  const [claimStatus, setClaimStatus] = useState<
+    null | 'ok' | 'dup' | 'limit' | 'error' | 'ip' | 'rate' | 'disposable'
+  >(null);
+  const [claimedEmail, setClaimedEmail] = useState<string | null>(null);
   const claimBusyRef = useRef(false);
 
   // newsletter (local confirm only for now)
@@ -162,24 +102,25 @@ function Landing() {
   const [newsletterDone, setNewsletterDone] = useState(false);
 
   useEffect(() => {
-  try {
-    const raw = localStorage.getItem(STORAGE_FOUND);
-    const solvedLocal = localStorage.getItem(STORAGE_SOLVED) === '1';
-    const signed = localStorage.getItem(STORAGE_SIGNUP) === '1';
-    if (raw) setFound(new Set<string>(JSON.parse(raw)));
-    setSolved(solvedLocal);
-    setNewsletterDone(signed);
+    try {
+      const raw = localStorage.getItem(STORAGE_FOUND);
+      const solvedLocal = localStorage.getItem(STORAGE_SOLVED) === '1';
+      const signed = localStorage.getItem(STORAGE_SIGNUP) === '1';
+      const already = localStorage.getItem(STORAGE_CLAIMED);
 
-    const s = new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
-    if (TARGET.every((t) => s.has(t)) && !solvedLocal) setRiddleOpen(true);
+      if (raw) setFound(new Set<string>(JSON.parse(raw)));
+      setSolved(solvedLocal);
+      setNewsletterDone(signed);
+      if (already) setClaimedEmail(already);
 
-    // Do NOT auto-open the claim modal on page load.
-    // We'll only open it when they click a button OR right after solving.
-    // (If you ever want to soft-nudge users, you could check a local flag here.)
-  } catch {}
-}, []);
+      const s = new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
+      if (TARGET.every((t) => s.has(t)) && !solvedLocal) setRiddleOpen(true);
 
-
+      // IMPORTANT: Do not auto-open the claim modal on page load.
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -235,18 +176,32 @@ function Landing() {
           letters: Array.from(found),
         }),
       });
-      if (res.ok) {
-        setClaimStatus('ok');
-        try {setClaimedEmail(claimEmail);
-setClaimOpen(false);
 
+      const data = await res.json().catch(() => ({} as any));
+      if (res.ok && (data as any)?.ok) {
+        setClaimStatus('ok');
+        setClaimedEmail(claimEmail);
+        try {
           localStorage.setItem(STORAGE_CLAIMED, claimEmail);
         } catch {}
-      } else if (res.status === 409) setClaimStatus('dup');
-      else if (res.status === 429) setClaimStatus('limit');
-      else setClaimStatus('ok'); // soft success if backend not wired yet
+        setClaimOpen(false);
+      } else {
+        const reason = (data as any)?.reason;
+        if (reason === 'email') setClaimStatus('dup');
+        else if (reason === 'ip') setClaimStatus('ip');
+        else if (reason === 'rate') setClaimStatus('rate');
+        else if (reason === 'disposable') setClaimStatus('disposable');
+        else if (res.status === 429) setClaimStatus('limit');
+        else setClaimStatus('error');
+      }
     } catch {
+      // Soft success if backend not wired yet
       setClaimStatus('ok');
+      setClaimedEmail(claimEmail);
+      try {
+        localStorage.setItem(STORAGE_CLAIMED, claimEmail);
+      } catch {}
+      setClaimOpen(false);
     } finally {
       claimBusyRef.current = false;
     }
@@ -266,11 +221,16 @@ setClaimOpen(false);
 
   return (
     <main className="min-h-screen bg-black text-white">
-      {/* Global style for subtle blink (so you don't have to edit globals.css) */}
+      {/* Global style for subtle blink */}
       <style jsx global>{`
         @keyframes fs-blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: .55; }
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.55;
+          }
         }
         .fs-blink {
           animation: fs-blink 1.2s ease-in-out infinite;
@@ -281,22 +241,26 @@ setClaimOpen(false);
       <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/70 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
           <Link href="/" className="flex items-center gap-3">
-           {/* make sure public/findsolin_logo.png exists */}
-<Image
-  src="/findsolin_logo.png"
-  alt="FindSolin"
-  width={160}
-  height={40}
-  priority
-/>
-
+            <Image
+              src="/findsolin_logo.png"
+              alt="FindSolin"
+              width={160}
+              height={40}
+              priority
+            />
             <span className="sr-only">FindSolin</span>
           </Link>
 
           <nav className="ml-auto flex items-center gap-6 text-sm">
-            <Link href="#about" className="hover:text-zinc-300">About</Link>
-            <Link href="#how" className="hover:text-zinc-300">How it works</Link>
-            <Link href="#join" className="hover:text-zinc-300">Join</Link>
+            <Link href="#about" className="hover:text-zinc-300">
+              About
+            </Link>
+            <Link href="#how" className="hover:text-zinc-300">
+              How it works
+            </Link>
+            <Link href="#join" className="hover:text-zinc-300">
+              Join
+            </Link>
           </nav>
         </div>
       </header>
@@ -306,40 +270,37 @@ setClaimOpen(false);
         <h1 className="text-5xl font-semibold leading-tight md:text-7xl">
           T
           <button
-  aria-label="(Hidden) letter H"
-  onClick={() => markFound('H')}
-  className={`inline-block align-baseline transition ${
-    debug ? 'outline outline-1 outline-fuchsia-500' : ''
-  }`}
-  title={debug ? 'Hidden H' : undefined}
->
-  <span
-    className={`inline-block align-baseline ${
-      !found.has('H') && !debug ? 'fs-blink' : ''
-    }`}
-    style={{ transform: 'rotate(-3deg) translateY(3px)', lineHeight: 0 }}
-    aria-hidden="true"
-  >
-    <Image
-      src="/letter-h.webp"
-      alt=""                 // decorative
-      width={42}
-      height={50}
-      priority
-      className="h-[50px] w-auto select-none pointer-events-none drop-shadow-[0_2px_2px_rgba(0,0,0,0.45)]"
-    />
-  </span>
-  <span className="sr-only">h</span>
-</button>
-
-
-
+            aria-label="(Hidden) letter H"
+            onClick={() => markFound('H')}
+            className={`inline-block align-baseline transition ${
+              debug ? 'outline outline-1 outline-fuchsia-500' : ''
+            }`}
+            title={debug ? 'Hidden H' : undefined}
+          >
+            <span
+              className={`inline-block align-baseline ${
+                !found.has('H') && !debug ? 'fs-blink' : ''
+              }`}
+              style={{ transform: 'rotate(-3deg) translateY(3px)', lineHeight: 0 }}
+              aria-hidden="true"
+            >
+              <Image
+                src="/letter-h.webp"
+                alt=""
+                width={42}
+                height={50}
+                priority
+                className="pointer-events-none h-[50px] w-auto select-none drop-shadow-[0_2px_2px_rgba(0,0,0,0.45)]"
+              />
+            </span>
+            <span className="sr-only">h</span>
+          </button>
           e adventure <span className="opacity-90">begins here.</span>
         </h1>
 
         <p className="mt-6 max-w-2xl text-zinc-300">
-          A gritty, real-world puzzle experience: hidden signals, digital trails,
-          and secrets that like to stay hidden.
+          A gritty, real-world puzzle experience: hidden signals, digital trails, and secrets that
+          like to stay hidden.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-4">
@@ -364,26 +325,26 @@ setClaimOpen(false);
             ? 'System unlocked. One last question…'
             : `Progress: ${found.size}/4 (${lettersLeft.join(', ')} left)`}
         </div>
-        {(solved || allFound) && !claimedEmail && (
-  <div className="mt-4">
-    <button
-      onClick={() => setClaimOpen(true)}
-      className="rounded-xl bg-white px-4 py-2 font-medium text-black hover:bg-zinc-200"
-    >
-      Claim your reward
-    </button>
-  </div>
-)}
-{claimedEmail && (
-  <div className="mt-4 text-sm text-zinc-400">
-    Reward already claimed for{' '}
-    <span className="text-zinc-300 font-medium">
-      {claimedEmail.replace(/(.).+(@.+)/, '$1•••$2')}
-    </span>
-    .
-  </div>
-)}
 
+        {(solved || allFound) && !claimedEmail && (
+          <div className="mt-4">
+            <button
+              onClick={() => setClaimOpen(true)}
+              className="rounded-xl bg-white px-4 py-2 font-medium text-black hover:bg-zinc-200"
+            >
+              Claim your reward
+            </button>
+          </div>
+        )}
+        {claimedEmail && (
+          <div className="mt-4 text-sm text-zinc-400">
+            Reward already claimed for{' '}
+            <span className="font-medium text-zinc-300">
+              {claimedEmail.replace(/(.).+(@.+)/, '$1•••$2')}
+            </span>
+            .
+          </div>
+        )}
       </section>
 
       {/* About */}
@@ -394,7 +355,9 @@ setClaimOpen(false);
           <button
             aria-label="(Hidden) letter O"
             onClick={() => markFound('O')}
-            className={`h-2 w-2 rounded-full ${debug ? 'bg-fuchsia-500' : 'bg-white/0'} relative ${!found.has('O') && !debug ? 'fs-blink' : ''}`}
+            className={`relative h-2 w-2 rounded-full ${
+              debug ? 'bg-fuchsia-500' : 'bg-white/0'
+            } ${!found.has('O') && !debug ? 'fs-blink' : ''}`}
           >
             <span
               className={`absolute inset-[-6px] rounded-full ${
@@ -417,7 +380,8 @@ setClaimOpen(false);
           <div className="rounded-2xl border border-white/10 p-5">
             <h3 className="font-medium">1 · Notice something odd</h3>
             <p className="mt-2 text-sm text-zinc-300">
-              A character slightly off, a dot that shouldn’t be there, a title that doesn’t sit straight…
+              A character slightly off, a dot that shouldn’t be there, a title that doesn’t sit
+              straight…
             </p>
           </div>
 
@@ -426,7 +390,9 @@ setClaimOpen(false);
             <button
               aria-label="(Hidden) letter M"
               onClick={() => markFound('M')}
-              className={`font-medium transition ${!found.has('M') && !debug ? 'fs-blink' : ''} ${debug ? 'outline outline-1 outline-fuchsia-500' : ''}`}
+              className={`font-medium transition ${!found.has('M') && !debug ? 'fs-blink' : ''} ${
+                debug ? 'outline outline-1 outline-fuchsia-500' : ''
+              }`}
               style={{ transform: 'rotate(1.5deg)' }}
             >
               2 · Work with your team
@@ -492,15 +458,9 @@ setClaimOpen(false);
       {/* Riddle modal */}
       <Modal
         open={riddleOpen && !solved}
-        <Modal
-  open={claimOpen}
-  onClose={() => {
-    try { localStorage.setItem('fs_claim_dismissed', '1'); } catch {}
-    setClaimOpen(false);
-  }}
-  title="Claim your reward"
->
-
+        onClose={() => setRiddleOpen(false)}
+        title="System unlocked → One last question"
+      >
         <p className="text-sm text-zinc-300">
           You found all four signals. Enter the final answer to proceed.
         </p>
@@ -511,12 +471,12 @@ setClaimOpen(false);
             placeholder="Your answer"
             className="w-full rounded-lg border border-white/10 bg-zinc-900/60 px-3 py-2 outline-none placeholder:text-zinc-500 focus:border-white/30"
           />
-        <button
-          type="submit"
-          className="rounded-lg bg-white px-4 py-2 font-medium text-black hover:bg-zinc-200"
-        >
-          Unlock
-        </button>
+          <button
+            type="submit"
+            className="rounded-lg bg-white px-4 py-2 font-medium text-black hover:bg-zinc-200"
+          >
+            Unlock
+          </button>
         </form>
         <div className="mt-3 text-xs text-zinc-500">Hint: where every hunt begins.</div>
       </Modal>
@@ -535,7 +495,11 @@ setClaimOpen(false);
             placeholder="your@email.com"
             className="w-full rounded-lg border border-white/10 bg-zinc-900/60 px-3 py-2 outline-none placeholder:text-zinc-500 focus:border-white/30"
           />
-          <button type="submit" className="w-full rounded-lg bg-white px-4 py-2 font-medium text-black hover:bg-zinc-200">
+          <button
+            type="submit"
+            className="w-full rounded-lg bg-white px-4 py-2 font-medium text-black hover:bg-zinc-200"
+            disabled={claimBusyRef.current}
+          >
             Claim
           </button>
         </form>
@@ -548,6 +512,21 @@ setClaimOpen(false);
         {claimStatus === 'dup' && (
           <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-300">
             It looks like this email already claimed a code.
+          </div>
+        )}
+        {claimStatus === 'ip' && (
+          <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-300">
+            A reward was already claimed from this connection.
+          </div>
+        )}
+        {claimStatus === 'rate' && (
+          <div className="mt-3 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-300">
+            Too many attempts right now. Please try again later.
+          </div>
+        )}
+        {claimStatus === 'disposable' && (
+          <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-300">
+            Disposable email addresses aren’t allowed. Please use a regular email.
           </div>
         )}
         {claimStatus === 'limit' && (
