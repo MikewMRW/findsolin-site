@@ -213,13 +213,15 @@ function Landing() {
       <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/70 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
           <Link href="/" className="flex items-center gap-3">
-           <Image
-  src="/findsolin_logo.png"  {/* make sure public/findsolin_logo.png exists */}
+           {/* make sure public/findsolin_logo.png exists */}
+<Image
+  src="/findsolin_logo.png"
   alt="FindSolin"
   width={160}
   height={40}
   priority
 />
+
             <span className="sr-only">FindSolin</span>
           </Link>
 
