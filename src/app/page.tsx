@@ -5,9 +5,89 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-// inline ransom-style "h" tile (SVG)
+
+// inline ransom-style "h" tile (SVG) — rough torn edges + paper noise + shadow
 function RansomH({ animate = false }: { animate?: boolean }) {
   return (
+    <span
+      className={`inline-block align-baseline ${animate ? 'fs-blink' : ''}`}
+      // sits a hair off in the heading
+      style={{ transform: 'rotate(-3deg) translateY(3px)', lineHeight: 0 }}
+      aria-hidden="true"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="34"   // tweak size here
+        height="42"
+        viewBox="0 0 120 150"
+        role="img"
+        aria-label="h (cut-out)"
+      >
+        <defs>
+          {/* roughen edges */}
+          <filter id="rip" x="-10%" y="-10%" width="120%" height="120%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="3" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+
+          {/* soft shadow for depth */}
+          <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="2.2" stdDeviation="2.2" floodColor="#000" floodOpacity="0.35" />
+          </filter>
+
+          {/* subtle paper fibers */}
+          <pattern id="paperNoise" patternUnits="userSpaceOnUse" width="60" height="60">
+            <rect width="60" height="60" fill="transparent" />
+            <g opacity=".12">
+              <circle cx="10" cy="18" r="0.9" fill="#000" />
+              <circle cx="28" cy="8"  r="0.6" fill="#000" />
+              <circle cx="42" cy="29" r="0.7" fill="#000" />
+              <circle cx="7"  cy="44" r="0.8" fill="#000" />
+              <circle cx="31" cy="51" r="0.9" fill="#000" />
+              <circle cx="54" cy="39" r="0.7" fill="#000" />
+            </g>
+          </pattern>
+        </defs>
+
+        {/* group to apply small skew and shared shadow */}
+        <g filter="url(#shadow)" transform="skewX(-2)">
+          {/* colored magazine scrap (irregular shape) */}
+          <path
+            d="M14 20 L98 14 L105 26 L92 34 L108 48 L94 58 L106 72 L86 82 L97 96 L78 104 L84 118 L63 120 L58 134 L44 126 L34 139 L26 122 L16 128 L18 108 L8 102 L18 90 L6 76 L22 70 L10 58 L22 52 L12 40 L24 34 Z"
+            fill="#d1602f"  /* change tile color here */
+            filter="url(#rip)"
+          />
+
+          {/* torn white paper on top (also rough) */}
+          <path
+            d="M20 32 L92 28 L88 38 L100 46 L90 54 L98 66 L84 74 L90 84 L76 90 L78 102 L64 104 L60 118 L48 111 L40 122 L34 110 L26 114 L28 98 L18 94 L24 84 L14 74 L26 68 L18 58 L26 52 L18 44 L28 38 Z"
+            fill="#fff"
+            filter="url(#rip)"
+          />
+
+          {/* light paper “texture” */}
+          <rect x="22" y="36" width="72" height="76" fill="url(#paperNoise)" />
+
+          {/* the letter (bold, italic serif for that magazine vibe) */}
+          <text
+            x="58"
+            y="97"
+            textAnchor="middle"
+            fontSize="78"
+            fontFamily="'Georgia','Times New Roman','Baskerville',serif"
+            fontWeight="800"
+            fontStyle="italic"
+            fill="#111"
+          >
+            h
+          </text>
+        </g>
+      </svg>
+    </span>
+  );
+}
+
+
     <span
       className={`inline-block align-baseline ${animate ? 'fs-blink' : ''}`}
       style={{ transform: 'rotate(-2.5deg) translateY(3px)', lineHeight: 0 }}
