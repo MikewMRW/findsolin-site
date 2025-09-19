@@ -17,7 +17,7 @@ function RansomH({ animate = false }: { animate?: boolean }) {
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="34"   // tweak size here
+        width="34"
         height="42"
         viewBox="0 0 120 150"
         role="img"
@@ -54,7 +54,7 @@ function RansomH({ animate = false }: { animate?: boolean }) {
           {/* colored magazine scrap (irregular shape) */}
           <path
             d="M14 20 L98 14 L105 26 L92 34 L108 48 L94 58 L106 72 L86 82 L97 96 L78 104 L84 118 L63 120 L58 134 L44 126 L34 139 L26 122 L16 128 L18 108 L8 102 L18 90 L6 76 L22 70 L10 58 L22 52 L12 40 L24 34 Z"
-            fill="#d1602f"  /* change tile color here */
+            fill="#d1602f"
             filter="url(#rip)"
           />
 
@@ -65,7 +65,7 @@ function RansomH({ animate = false }: { animate?: boolean }) {
             filter="url(#rip)"
           />
 
-          {/* light paper “texture” */}
+          {/* light paper texture */}
           <rect x="22" y="36" width="72" height="76" fill="url(#paperNoise)" />
 
           {/* the letter (bold, italic serif for that magazine vibe) */}
