@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+# Optional: add this later when you generate a sitemap
+# Sitemap: https://www.findsolin.com/sitemap.xml
