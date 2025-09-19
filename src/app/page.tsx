@@ -137,6 +137,22 @@ function Landing() {
   } finally {
     claimBusyRef.current = false;
   }
+    {claimStatus === 'ip' && (
+  <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-300">
+    A reward was already claimed from this connection.
+  </div>
+)}
+{claimStatus === 'rate' && (
+  <div className="mt-3 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-300">
+    Too many attempts right now. Please try again later.
+  </div>
+)}
+{claimStatus === 'disposable' && (
+  <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-300">
+    Disposable email addresses aren’t allowed. Please use a regular email.
+  </div>
+)}
+
 };
 
   const claimBusyRef = useRef(false);
