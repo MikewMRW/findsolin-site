@@ -83,6 +83,8 @@ export default function Page() {
 function Landing() {
   const search = useSearchParams();
   const debug = useMemo(() => search.get('debug') === '1', [search]);
+  const [claimedEmail, setClaimedEmail] = useState<string | null>(null);
+
 
   // puzzle state
   const [found, setFound] = useState<FoundSet>(new Set<string>());
@@ -102,19 +104,24 @@ function Landing() {
   const [newsletterDone, setNewsletterDone] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_FOUND);
-      const solvedLocal = localStorage.getItem(STORAGE_SOLVED) === '1';
-      const signed = localStorage.getItem(STORAGE_SIGNUP) === '1';
-      if (raw) setFound(new Set<string>(JSON.parse(raw)));
-      setSolved(solvedLocal);
-      setNewsletterDone(signed);
+  try {
+    const raw = localStorage.getItem(STORAGE_FOUND);
+    const solvedLocal = localStorage.getItem(STORAGE_SOLVED) === '1';
+    const signed = localStorage.getItem(STORAGE_SIGNUP) === '1';
+    const claimed = localStorage.getItem(STORAGE_CLAIMED);
 
-      const s = new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
-      if (TARGET.every((t) => s.has(t)) && !solvedLocal) setRiddleOpen(true);
-      if (solvedLocal) setClaimOpen(true);
-    } catch {}
-  }, []);
+    if (raw) setFound(new Set<string>(JSON.parse(raw)));
+    setSolved(solvedLocal);
+    setNewsletterDone(signed);
+    if (claimed) setClaimedEmail(claimed);
+
+    // Only open the riddle automatically when ALL letters are found
+    // (Do NOT auto-open the claim modal anymore)
+    const s = new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
+    if (TARGET.every((t) => s.has(t)) && !solvedLocal) setRiddleOpen(true);
+  } catch {}
+}, []);
+
 
   const showToast = (msg: string) => {
     setToast(msg);
