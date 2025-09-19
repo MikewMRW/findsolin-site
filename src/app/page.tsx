@@ -179,7 +179,9 @@ function Landing() {
       });
       if (res.ok) {
         setClaimStatus('ok');
-        try {
+        try {setClaimedEmail(claimEmail);
+setClaimOpen(false);
+
           localStorage.setItem(STORAGE_CLAIMED, claimEmail);
         } catch {}
       } else if (res.status === 409) setClaimStatus('dup');
@@ -304,6 +306,26 @@ function Landing() {
             ? 'System unlocked. One last question…'
             : `Progress: ${found.size}/4 (${lettersLeft.join(', ')} left)`}
         </div>
+        {(solved || allFound) && !claimedEmail && (
+  <div className="mt-4">
+    <button
+      onClick={() => setClaimOpen(true)}
+      className="rounded-xl bg-white px-4 py-2 font-medium text-black hover:bg-zinc-200"
+    >
+      Claim your reward
+    </button>
+  </div>
+)}
+{claimedEmail && (
+  <div className="mt-4 text-sm text-zinc-400">
+    Reward already claimed for{' '}
+    <span className="text-zinc-300 font-medium">
+      {claimedEmail.replace(/(.).+(@.+)/, '$1•••$2')}
+    </span>
+    .
+  </div>
+)}
+
       </section>
 
       {/* About */}
