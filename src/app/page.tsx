@@ -64,8 +64,7 @@ const STORAGE_SIGNUP = 'fs_newsletter_signup';
 const TARGET = ['H', 'O', 'M', 'E'];
 
 /* ============================================================
-   OUTER WRAPPER: provides the Suspense boundary required by
-   Next.js when using useSearchParams in a client component.
+   OUTER WRAPPER (Suspense needed for useSearchParams in Next 15)
    ============================================================ */
 export default function Page() {
   return (
@@ -197,12 +196,23 @@ function Landing() {
 
   return (
     <main className="min-h-screen bg-black text-white">
+      {/* Global style for subtle blink (so you don't have to edit globals.css) */}
+      <style jsx global>{`
+        @keyframes fs-blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: .55; }
+        }
+        .fs-blink {
+          animation: fs-blink 1.2s ease-in-out infinite;
+        }
+      `}</style>
+
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/70 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
           <Link href="/" className="flex items-center gap-3">
             <Image
-              src="/findsolin_logo.png"
+              src="/findsolin_logo.png"  // make sure public/findsolin_logo.png exists
               alt="FindSolin"
               width={160}
               height={40}
@@ -268,10 +278,11 @@ function Landing() {
       <section id="about" className="mx-auto max-w-6xl border-t border-white/10 px-6 py-16">
         <h2 className="flex items-center gap-2 text-2xl font-semibold">
           What is FindSolin?
+          {/* tiny “watchful eye” dot — click = O */}
           <button
             aria-label="(Hidden) letter O"
             onClick={() => markFound('O')}
-            className={`h-2 w-2 rounded-full ${debug ? 'bg-fuchsia-500' : 'bg-white/0'} relative`}
+            className={`h-2 w-2 rounded-full ${debug ? 'bg-fuchsia-500' : 'bg-white/0'} relative ${!found.has('O') && !debug ? 'fs-blink' : ''}`}
           >
             <span
               className={`absolute inset-[-6px] rounded-full ${
@@ -299,10 +310,11 @@ function Landing() {
           </div>
 
           <div className="rounded-2xl border border-white/10 p-5">
+            {/* Step 2 title is the clickable “M” target (slightly rotated) */}
             <button
               aria-label="(Hidden) letter M"
               onClick={() => markFound('M')}
-              className={`font-medium transition ${debug ? 'outline outline-1 outline-fuchsia-500' : ''}`}
+              className={`font-medium transition ${!found.has('M') && !debug ? 'fs-blink' : ''} ${debug ? 'outline outline-1 outline-fuchsia-500' : ''}`}
               style={{ transform: 'rotate(1.5deg)' }}
             >
               2 · Work with your team
@@ -366,8 +378,14 @@ function Landing() {
       </footer>
 
       {/* Riddle modal */}
-      <Modal open={riddleOpen && !solved} onClose={() => setRiddleOpen(false)} title="System unlocked → One last question">
-        <p className="text-sm text-zinc-300">You found all four signals. Enter the final answer to proceed.</p>
+      <Modal
+        open={riddleOpen && !solved}
+        onClose={() => setRiddleOpen(false)}
+        title="System unlocked → One last question"
+      >
+        <p className="text-sm text-zinc-300">
+          You found all four signals. Enter the final answer to proceed.
+        </p>
         <form onSubmit={onAnswer} className="mt-4 flex gap-2">
           <input
             value={answer}
@@ -375,9 +393,12 @@ function Landing() {
             placeholder="Your answer"
             className="w-full rounded-lg border border-white/10 bg-zinc-900/60 px-3 py-2 outline-none placeholder:text-zinc-500 focus:border-white/30"
           />
-          <button type="submit" className="rounded-lg bg-white px-4 py-2 font-medium text-black hover:bg-zinc-200">
-            Unlock
-          </button>
+        <button
+          type="submit"
+          className="rounded-lg bg-white px-4 py-2 font-medium text-black hover:bg-zinc-200"
+        >
+          Unlock
+        </button>
         </form>
         <div className="mt-3 text-xs text-zinc-500">Hint: where every hunt begins.</div>
       </Modal>
