@@ -8,45 +8,6 @@ import { useSearchParams } from 'next/navigation';
 
 
 
-    <span
-      className={`inline-block align-baseline ${animate ? 'fs-blink' : ''}`}
-      style={{ transform: 'rotate(-2.5deg) translateY(3px)', lineHeight: 0 }}
-      aria-hidden="true"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="28"
-        height="36"
-        viewBox="0 0 100 130"
-        role="img"
-        aria-label="h (cut-out)"
-      >
-        {/* colored magazine tile */}
-        <rect x="6" y="9" width="88" height="112" rx="7" ry="7" fill="#d46f2e" />
-        {/* torn white paper */}
-        <path
-          d="M12 24 L86 20 83 31 93 38 84 46 92 56 82 64 88 72 79 79 85 92 71 98 73 109 60 110 56 121 44 117 36 125 30 113 20 117 21 101 11 97 18 86 10 76 21 70 12 59 21 54 15 44 24 38 16 28 Z"
-          fill="#fff"
-        />
-        {/* the letter */}
-        <text
-          x="50"
-          y="86"
-          textAnchor="middle"
-          fontSize="72"
-          fontFamily="'Georgia','Times New Roman',serif"
-          fontWeight="700"
-          fontStyle="italic"
-          fill="#111"
-        >
-          h
-        </text>
-      </svg>
-    </span>
-  );
-}
-
-
 /* --------------------- tiny UI helpers --------------------- */
 function Toast({ message }: { message: string | null }) {
   if (!message) return null;
