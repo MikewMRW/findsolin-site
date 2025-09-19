@@ -108,19 +108,19 @@ function Landing() {
     const raw = localStorage.getItem(STORAGE_FOUND);
     const solvedLocal = localStorage.getItem(STORAGE_SOLVED) === '1';
     const signed = localStorage.getItem(STORAGE_SIGNUP) === '1';
-    const claimed = localStorage.getItem(STORAGE_CLAIMED);
-
     if (raw) setFound(new Set<string>(JSON.parse(raw)));
     setSolved(solvedLocal);
     setNewsletterDone(signed);
-    if (claimed) setClaimedEmail(claimed);
 
-    // Only open the riddle automatically when ALL letters are found
-    // (Do NOT auto-open the claim modal anymore)
     const s = new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
     if (TARGET.every((t) => s.has(t)) && !solvedLocal) setRiddleOpen(true);
+
+    // Do NOT auto-open the claim modal on page load.
+    // We'll only open it when they click a button OR right after solving.
+    // (If you ever want to soft-nudge users, you could check a local flag here.)
   } catch {}
 }, []);
+
 
 
   const showToast = (msg: string) => {
