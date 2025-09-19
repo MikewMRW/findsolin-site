@@ -234,14 +234,17 @@ function Landing() {
         <h1 className="text-5xl font-semibold leading-tight md:text-7xl">
           T
           <button
-            aria-label="(Hidden) letter H"
-            onClick={() => markFound('H')}
-            className={`inline-block align-baseline transition ${
-              debug ? 'outline outline-1 outline-fuchsia-500' : ''
-            }`}
-          >
-            h
-          </button>
+  aria-label="(Hidden) letter H"
+  onClick={() => markFound('H')}
+  className={`inline-block align-baseline font-mono italic tracking-tight text-[0.98em] text-zinc-200/90 transition ${
+    debug ? 'outline outline-1 outline-fuchsia-500' : ''
+  }`}
+  style={{ transform: 'translateY(1px) rotate(-2deg)' }}
+  title={debug ? 'Hidden H' : undefined}
+>
+  h
+</button>
+
           e adventure <span className="opacity-90">begins here.</span>
         </h1>
 
