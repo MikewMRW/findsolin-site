@@ -49,6 +49,13 @@ function Modal({
             aria-label="Close"
             className="rounded-md px-2 py-1 text-zinc-400 hover:bg-white/5 hover:text-white"
           >
+            <button
+  onClick={() => setClaimOpen(true)}
+  className="rounded-xl border border-white/20 px-6 py-3 font-medium hover:bg-white/5"
+>
+  Claim reward
+</button>
+
             ✕
           </button>
         </div>
