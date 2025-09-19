@@ -3,9 +3,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
+/* --------------------- tiny UI helpers --------------------- */
 function Toast({ message }: { message: string | null }) {
   if (!message) return null;
   return (
@@ -54,16 +55,30 @@ function Modal({
   );
 }
 
+/* ------------------------- constants ------------------------ */
 type FoundSet = Set<string>;
-
 const STORAGE_FOUND = 'fs_found_letters';
 const STORAGE_SOLVED = 'fs_riddle_solved';
 const STORAGE_CLAIMED = 'fs_claimed_email';
 const STORAGE_SIGNUP = 'fs_newsletter_signup';
-
 const TARGET = ['H', 'O', 'M', 'E'];
 
-export default function Home() {
+/* ============================================================
+   OUTER WRAPPER: provides the Suspense boundary required by
+   Next.js when using useSearchParams in a client component.
+   ============================================================ */
+export default function Page() {
+  return (
+    <Suspense fallback={null}>
+      <Landing />
+    </Suspense>
+  );
+}
+
+/* ============================================================
+   INNER COMPONENT: actual page content (uses useSearchParams)
+   ============================================================ */
+function Landing() {
   const search = useSearchParams();
   const debug = useMemo(() => search.get('debug') === '1', [search]);
 
@@ -80,7 +95,7 @@ export default function Home() {
   const [claimStatus, setClaimStatus] = useState<null | 'ok' | 'dup' | 'limit' | 'error'>(null);
   const claimBusyRef = useRef(false);
 
-  // newsletter (local confirm only)
+  // newsletter (local confirm only for now)
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterDone, setNewsletterDone] = useState(false);
 
@@ -121,9 +136,7 @@ export default function Home() {
     persistFound(next);
     const count = next.size;
     showToast(`Found ${letter} (${count}/${TARGET.length})`);
-    if (count >= TARGET.length) {
-      setTimeout(() => setRiddleOpen(true), 500);
-    }
+    if (count >= TARGET.length) setTimeout(() => setRiddleOpen(true), 500);
   };
 
   const onAnswer = (e: React.FormEvent) => {
@@ -160,13 +173,9 @@ export default function Home() {
         try {
           localStorage.setItem(STORAGE_CLAIMED, claimEmail);
         } catch {}
-      } else if (res.status === 409) {
-        setClaimStatus('dup');
-      } else if (res.status === 429) {
-        setClaimStatus('limit');
-      } else {
-        setClaimStatus('ok'); // soft success if backend not yet wired
-      }
+      } else if (res.status === 409) setClaimStatus('dup');
+      else if (res.status === 429) setClaimStatus('limit');
+      else setClaimStatus('ok'); // soft success if backend not wired yet
     } catch {
       setClaimStatus('ok');
     } finally {
@@ -193,7 +202,7 @@ export default function Home() {
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
           <Link href="/" className="flex items-center gap-3">
             <Image
-              src="/findsolin_logo.png"  // make sure public/findsolin_logo.png exists
+              src="/findsolin_logo.png"
               alt="FindSolin"
               width={160}
               height={40}
