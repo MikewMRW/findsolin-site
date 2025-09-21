@@ -107,7 +107,10 @@ const [showSignupCongrats, setShowSignupCongrats] = useState(false);  // ephemer
     try {
       const raw = localStorage.getItem(STORAGE_FOUND);
       const solvedLocal = localStorage.getItem(STORAGE_SOLVED) === '1';
-      const signed = localStorage.getItem(STORAGE_SIGNUP) === '1';
+     const signed = localStorage.getItem(STORAGE_SIGNUP) === '1';
+setNewsletterSigned(signed);
+// NOTE: do NOT set showSignupCongrats here
+
       const already = localStorage.getItem(STORAGE_CLAIMED);
 
       if (raw) setFound(new Set<string>(JSON.parse(raw)));
@@ -210,13 +213,14 @@ const [showSignupCongrats, setShowSignupCongrats] = useState(false);  // ephemer
   };
 
   const onNewsletter = (e: React.FormEvent) => {
-    e.preventDefault();
-    setNewsletterDone(true);
-    try {
-      localStorage.setItem(STORAGE_SIGNUP, '1');
-    } catch {}
-    showToast("You're signed up! Psst… you might have missed something.");
-  };
+  e.preventDefault();
+  setNewsletterSigned(true);
+  setShowSignupCongrats(true);               // show once, now
+  try { localStorage.setItem(STORAGE_SIGNUP, '1'); } catch {}
+  setNewsletterEmail('');                    // clear the field
+  setTimeout(() => setShowSignupCongrats(false), 6000); // optional auto-hide
+};
+
 
   const lettersLeft = TARGET.filter((t) => !found.has(t));
   const allFound = TARGET.every((t) => found.has(t));
@@ -420,28 +424,32 @@ const [showSignupCongrats, setShowSignupCongrats] = useState(false);  // ephemer
           Be first to know when we launch. (And maybe get a nudge if you missed something…)
         </p>
 
-        <form onSubmit={onNewsletter} className="mt-6 flex max-w-xl gap-3">
-          <input
-            type="email"
-            required
-            value={newsletterEmail}
-            onChange={(e) => setNewsletterEmail(e.target.value)}
-            placeholder="your@email.com"
-            className="w-full rounded-xl border border-white/10 bg-zinc-900/60 px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:border-white/30"
-          />
-          <button
-            type="submit"
-            className="rounded-xl bg-white px-5 py-3 font-medium text-black hover:bg-zinc-200"
-          >
-            Sign up
-          </button>
-        </form>
+        {/* disable if already signed (optional) */}
+<form onSubmit={onNewsletter} className="mt-6 flex max-w-xl gap-3">
+  <input
+    type="email"
+    required
+    disabled={newsletterSigned}
+    value={newsletterEmail}
+    onChange={(e) => setNewsletterEmail(e.target.value)}
+    placeholder="your@email.com"
+    className="w-full rounded-xl border border-white/10 bg-zinc-900/60 px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:border-white/30 disabled:opacity-60"
+  />
+  <button
+    type="submit"
+    disabled={newsletterSigned}
+    className="rounded-xl bg-white px-5 py-3 font-medium text-black hover:bg-zinc-200 disabled:opacity-60"
+  >
+    {newsletterSigned ? 'You’re on the list' : 'Sign up'}
+  </button>
+</form>
 
-        {newsletterDone && (
-          <div className="mt-3 text-sm text-zinc-400">
-            Thanks for signing up! Psst… you might have missed something on this page.
-          </div>
-        )}
+{showSignupCongrats && (
+  <div className="mt-3 text-sm text-zinc-400">
+    Thanks for signing up! Psst… you might have missed something on this page.
+  </div>
+)}
+
       </section>
 
       {/* Footer (hidden “E”) */}
