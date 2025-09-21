@@ -98,8 +98,10 @@ function Landing() {
   const claimBusyRef = useRef(false);
 
   // newsletter (local confirm only for now)
-  const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [newsletterDone, setNewsletterDone] = useState(false);
+const [newsletterEmail, setNewsletterEmail] = useState('');
+const [newsletterSigned, setNewsletterSigned] = useState(false);      // persisted
+const [showSignupCongrats, setShowSignupCongrats] = useState(false);  // ephemeral UI
+
 
   useEffect(() => {
     try {
