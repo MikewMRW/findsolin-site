@@ -6,8 +6,10 @@ export const metadata: Metadata = {
     default: 'FindSolin',
     template: '%s · FindSolin',
   },
-  description: 'An immersive, real-world puzzle experience.',
+  description:
+    'Gritty. Mysterious. Captivating. FindSolin makes real cases feel within reach—an immersive hunt where you chase leads, connect the dots, and feel the rush.',
 };
+
 
 export default function RootLayout({
   children,
