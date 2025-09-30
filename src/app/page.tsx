@@ -98,30 +98,25 @@ function Landing() {
   const claimBusyRef = useRef(false);
 
   // newsletter (local confirm only for now)
-const [newsletterEmail, setNewsletterEmail] = useState('');
-const [newsletterSigned, setNewsletterSigned] = useState(false);      // persisted
-const [showSignupCongrats, setShowSignupCongrats] = useState(false);  // ephemeral UI
-
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterSigned, setNewsletterSigned] = useState(false);     // persisted
+  const [showSignupCongrats, setShowSignupCongrats] = useState(false); // ephemeral UI
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_FOUND);
       const solvedLocal = localStorage.getItem(STORAGE_SOLVED) === '1';
-     const signed = localStorage.getItem(STORAGE_SIGNUP) === '1';
-setNewsletterSigned(signed);
-// NOTE: do NOT set showSignupCongrats here
+      const signed = localStorage.getItem(STORAGE_SIGNUP) === '1';
+      setNewsletterSigned(signed); // set persisted state from localStorage (no toast)
 
       const already = localStorage.getItem(STORAGE_CLAIMED);
 
       if (raw) setFound(new Set<string>(JSON.parse(raw)));
       setSolved(solvedLocal);
-      setNewsletterDone(signed);
       if (already) setClaimedEmail(already);
 
       const s = new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
       if (TARGET.every((t) => s.has(t)) && !solvedLocal) setRiddleOpen(true);
-
-      // IMPORTANT: Do not auto-open the claim modal on page load.
     } catch {
       // ignore
     }
@@ -213,14 +208,15 @@ setNewsletterSigned(signed);
   };
 
   const onNewsletter = (e: React.FormEvent) => {
-  e.preventDefault();
-  setNewsletterSigned(true);
-  setShowSignupCongrats(true);               // show once, now
-  try { localStorage.setItem(STORAGE_SIGNUP, '1'); } catch {}
-  setNewsletterEmail('');                    // clear the field
-  setTimeout(() => setShowSignupCongrats(false), 6000); // optional auto-hide
-};
-
+    e.preventDefault();
+    setNewsletterSigned(true);
+    setShowSignupCongrats(true); // show once now
+    try {
+      localStorage.setItem(STORAGE_SIGNUP, '1');
+    } catch {}
+    setNewsletterEmail(''); // clear the field
+    setTimeout(() => setShowSignupCongrats(false), 6000); // optional auto-hide
+  };
 
   const lettersLeft = TARGET.filter((t) => !found.has(t));
   const allFound = TARGET.every((t) => found.has(t));
@@ -305,9 +301,9 @@ setNewsletterSigned(signed);
         </h1>
 
         <p className="mt-6 max-w-2xl text-zinc-300">
-  Gritty. Mysterious. Captivating. FindSolin makes real cases feel within reach—an immersive hunt where you chase leads, connect the dots, and feel the rush.
-</p>
-
+          Gritty. Mysterious. Captivating. FindSolin makes real cases feel within reach—an
+          immersive hunt where you chase leads, connect the dots, and feel the rush.
+        </p>
 
         <div className="mt-8 flex flex-wrap gap-4">
           <a
@@ -358,24 +354,25 @@ setNewsletterSigned(signed);
         <h2 className="flex items-center gap-2 text-2xl font-semibold">
           What is FindSolin?
           {/* tiny “watchful eye” dot — click = O */}
-          <button
-            aria-label="(Hidden) letter O"
-            onClick={() => markFound('O')}
-            className={`relative h-2 w-2 rounded-full ${
-              debug ? 'bg-fuchsia-500' : 'bg-white/0'
-            } ${!found.has('O') && !debug ? 'fs-blink' : ''}`}
-          >
-            <span
-              className={`absolute inset-[-6px] rounded-full ${
-                debug ? 'outline outline-1 outline-fuchsia-500' : ''
-              }`}
-            />
-          </button>
         </h2>
         <p className="mt-4 max-w-3xl text-zinc-300">
           A community puzzle hunt that blends the web with the real world. Sharp eyes are rewarded.
           Every step is solvable right here on this page.
         </p>
+        <button
+          aria-label="(Hidden) letter O"
+          onClick={() => markFound('O')}
+          className={`relative mt-3 h-2 w-2 rounded-full ${
+            debug ? 'bg-fuchsia-500' : 'bg-white/0'
+          } ${!found.has('O') && !debug ? 'fs-blink' : ''}`}
+          title={debug ? 'Hidden O' : undefined}
+        >
+          <span
+            className={`absolute inset-[-6px] rounded-full ${
+              debug ? 'outline outline-1 outline-fuchsia-500' : ''
+            }`}
+          />
+        </button>
       </section>
 
       {/* How it works */}
@@ -425,31 +422,30 @@ setNewsletterSigned(signed);
         </p>
 
         {/* disable if already signed (optional) */}
-<form onSubmit={onNewsletter} className="mt-6 flex max-w-xl gap-3">
-  <input
-    type="email"
-    required
-    disabled={newsletterSigned}
-    value={newsletterEmail}
-    onChange={(e) => setNewsletterEmail(e.target.value)}
-    placeholder="your@email.com"
-    className="w-full rounded-xl border border-white/10 bg-zinc-900/60 px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:border-white/30 disabled:opacity-60"
-  />
-  <button
-    type="submit"
-    disabled={newsletterSigned}
-    className="rounded-xl bg-white px-5 py-3 font-medium text-black hover:bg-zinc-200 disabled:opacity-60"
-  >
-    {newsletterSigned ? 'You’re on the list' : 'Sign up'}
-  </button>
-</form>
+        <form onSubmit={onNewsletter} className="mt-6 flex max-w-xl gap-3">
+          <input
+            type="email"
+            required
+            disabled={newsletterSigned}
+            value={newsletterEmail}
+            onChange={(e) => setNewsletterEmail(e.target.value)}
+            placeholder="your@email.com"
+            className="w-full rounded-xl border border-white/10 bg-zinc-900/60 px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:border-white/30 disabled:opacity-60"
+          />
+          <button
+            type="submit"
+            disabled={newsletterSigned}
+            className="rounded-xl bg-white px-5 py-3 font-medium text-black hover:bg-zinc-200 disabled:opacity-60"
+          >
+            {newsletterSigned ? 'You’re on the list' : 'Sign up'}
+          </button>
+        </form>
 
-{showSignupCongrats && (
-  <div className="mt-3 text-sm text-zinc-400">
-    Thanks for signing up! Psst… you might have missed something on this page.
-  </div>
-)}
-
+        {showSignupCongrats && (
+          <div className="mt-3 text-sm text-zinc-400">
+            Thanks for signing up! Psst… you might have missed something on this page.
+          </div>
+        )}
       </section>
 
       {/* Footer (hidden “E”) */}
