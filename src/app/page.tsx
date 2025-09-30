@@ -305,9 +305,9 @@ setNewsletterSigned(signed);
         </h1>
 
         <p className="mt-6 max-w-2xl text-zinc-300">
-          A gritty, real-world puzzle experience: hidden signals, digital trails, and secrets that
-          like to stay hidden.
-        </p>
+  Gritty. Mysterious. Captivating. FindSolin makes real cases feel within reach—an immersive hunt where you chase leads, connect the dots, and feel the rush.
+</p>
+
 
         <div className="mt-8 flex flex-wrap gap-4">
           <a
