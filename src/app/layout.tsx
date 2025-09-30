@@ -1,24 +1,16 @@
-import type { Metadata } from 'next';
-import './globals.css';
-
-export const metadata: Metadata = {
-  title: {
-    default: 'FindSolin',
-    template: '%s · FindSolin',
+export const metadata = {
+  title: { default: 'FindSolin', template: '%s · FindSolin' },
+  description: 'Gritty. Mysterious. Captivating. A real-world investigation you can step into—chase leads, connect the dots, feel the rush.',
+  openGraph: {
+    type: 'website',
+    title: 'FindSolin',
+    description: 'Gritty. Mysterious. Captivating. A real-world investigation you can step into—chase leads, connect the dots, feel the rush.',
+    images: [{ url: '/og.jpg', width: 1200, height: 630 }],
   },
-  description:
-    'Gritty. Mysterious. Captivating. FindSolin makes real cases feel within reach—an immersive hunt where you chase leads, connect the dots, and feel the rush.',
+  twitter: {
+    card: 'summary_large_image',
+    title: 'FindSolin',
+    description: 'Gritty. Mysterious. Captivating. A real-world investigation you can step into—chase leads, connect the dots, feel the rush.',
+    images: ['/og.jpg'],
+  },
 };
-
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
-}
