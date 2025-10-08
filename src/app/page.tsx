@@ -270,43 +270,39 @@ function Landing() {
       {/* Hero */}
       <section className="mx-auto max-w-6xl px-6 py-16">
         <h1 className="text-5xl font-semibold leading-tight md:text-7xl">
-          T
-          <button
-            aria-label="(Hidden) letter H"
-            onClick={() => markFound('H')}
-            className={`inline-block align-baseline transition ${
-              debug ? 'outline outline-1 outline-fuchsia-500' : ''
-            }`}
-            title={debug ? 'Hidden H' : undefined}
-          >
-            <span
-  className={`inline-block align-baseline ${
-    !found.has('H') && !debug ? 'fs-blink' : ''
-  }`}
-  style={{ transform: 'rotate(-3deg) translateY(3px)', lineHeight: 0 }}
-  aria-hidden="true"
->
-  <span
-  className={`inline-block align-baseline ${
-    !found.has('H') && !debug ? 'fs-blink' : ''
-  }`}
-  style={{ transform: 'rotate(-3deg) translateY(3px)', lineHeight: 0 }}
-  aria-hidden="true"
->
-  <Image
-    src="/hransom.png"
-    alt="Ransom letter H"
-    width={160}
-    height={185}
-    priority
-    style={{ objectFit: 'contain' }}
-  />
-</span>
-<span className="sr-only">h</span>
+  T
+  <button
+    aria-label="(Hidden) letter H"
+    onClick={() => markFound('H')}
+    className={`inline-block align-baseline transition ${
+      debug ? 'outline outline-1 outline-fuchsia-500' : ''
+    }`}
+    title={debug ? 'Hidden H' : undefined}
+  >
+    <span
+      className={`inline-block align-baseline ${
+        !found.has('H') && !debug ? 'fs-blink' : ''
+      }`}
+      style={{ transform: 'rotate(-3deg) translateY(3px)', lineHeight: 0 }}
+      aria-hidden="true"
+    >
+      {/* sized wrapper so the image can't blow up */}
+      <span className="relative inline-block w-[120px] h-[140px] md:w-[160px] md:h-[185px]">
+        <Image
+          src="/hransom.png"
+          alt="Ransom letter H"
+          fill
+          sizes="(max-width: 768px) 120px, 160px"
+          style={{ objectFit: 'contain' }}
+          priority
+        />
+      </span>
+    </span>
+    <span className="sr-only">h</span>
+  </button>
+  e adventure <span className="opacity-90">begins here.</span>
+</h1>
 
-          </button>
-          e adventure <span className="opacity-90">begins here.</span>
-        </h1>
 
         <p className="mt-6 max-w-2xl text-zinc-300">
           Gritty. Mysterious. Captivating. FindSolin makes real cases feel within reach—an
