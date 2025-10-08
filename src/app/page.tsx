@@ -286,21 +286,24 @@ function Landing() {
   style={{ transform: 'rotate(-3deg) translateY(3px)', lineHeight: 0 }}
   aria-hidden="true"
 >
-  <span className="relative inline-block w-[120px] h-[140px] md:w-[160px] md:h-[185px]">
-    <Image
-      src="/hransom.png"                // file in public/
-      alt="Ransom letter H"
-      fill
-      sizes="(max-width: 768px) 120px, 160px"
-      style={{ objectFit: 'contain' }}
-      priority
-    />
-  </span>
+  <span
+  className={`inline-block align-baseline ${
+    !found.has('H') && !debug ? 'fs-blink' : ''
+  }`}
+  style={{ transform: 'rotate(-3deg) translateY(3px)', lineHeight: 0 }}
+  aria-hidden="true"
+>
+  <Image
+    src="/hransom.png"
+    alt="Ransom letter H"
+    width={160}
+    height={185}
+    priority
+    style={{ objectFit: 'contain' }}
+  />
 </span>
+<span className="sr-only">h</span>
 
-
-            </span>
-            <span className="sr-only">h</span>
           </button>
           e adventure <span className="opacity-90">begins here.</span>
         </h1>
