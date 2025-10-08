@@ -287,13 +287,14 @@ function Landing() {
               aria-hidden="true"
             >
               <Image
-                src="/letter-h.webp"
-                alt=""
-                width={42}
-                height={50}
-                priority
-                className="pointer-events-none h-[50px] w-auto select-none drop-shadow-[0_2px_2px_rgba(0,0,0,0.45)]"
-              />
+  src="/assets/h-ransom.png"
+  alt="Ransom letter H"
+  width={300}
+  height={300}
+  priority
+  style={{ objectFit: 'contain', background: 'transparent' }}
+/>
+
             </span>
             <span className="sr-only">h</span>
           </button>
