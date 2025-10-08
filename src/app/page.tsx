@@ -280,20 +280,24 @@ function Landing() {
             title={debug ? 'Hidden H' : undefined}
           >
             <span
-              className={`inline-block align-baseline ${
-                !found.has('H') && !debug ? 'fs-blink' : ''
-              }`}
-              style={{ transform: 'rotate(-3deg) translateY(3px)', lineHeight: 0 }}
-              aria-hidden="true"
-            >
-              <Image
-  src="/hransom.png"
-  alt="Ransom letter H"
-  width={300}
-  height={300}
-  priority
-  style={{ objectFit: 'contain', background: 'transparent' }}
-/>
+  className={`inline-block align-baseline ${
+    !found.has('H') && !debug ? 'fs-blink' : ''
+  }`}
+  style={{ transform: 'rotate(-3deg) translateY(3px)', lineHeight: 0 }}
+  aria-hidden="true"
+>
+  <span className="relative inline-block w-[120px] h-[140px] md:w-[160px] md:h-[185px]">
+    <Image
+      src="/hransom.png"                // file in public/
+      alt="Ransom letter H"
+      fill
+      sizes="(max-width: 768px) 120px, 160px"
+      style={{ objectFit: 'contain' }}
+      priority
+    />
+  </span>
+</span>
+
 
             </span>
             <span className="sr-only">h</span>
