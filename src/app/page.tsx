@@ -287,7 +287,7 @@ function Landing() {
               aria-hidden="true"
             >
               <Image
-  src="/h-ransom.png"
+  src="/hransom.png"
   alt="Ransom letter H"
   width={300}
   height={300}
