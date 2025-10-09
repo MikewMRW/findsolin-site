@@ -279,7 +279,7 @@ function Landing() {
   }`}
   title={debug ? 'Hidden H' : undefined}
 >
-  <span className="relative block w-[84px] h-[100px] md:w-[104px] md:h-[124px] lg:w-[116px] lg:h-[138px] drop-shadow-[0_10px_26px_rgba(0,0,0,0.6)]">
+  <span className="relative block w-[84px] h-[90px] md:w-[104px] md:h-[124px] lg:w-[116px] lg:h-[138px] drop-shadow-[0_10px_26px_rgba(0,0,0,0.6)]">
     <Image
       src="/hransom.png"
       alt="Ransom letter H"
