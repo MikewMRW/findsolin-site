@@ -274,7 +274,7 @@ function Landing() {
   <button
   aria-label="(Hidden) letter H"
   onClick={() => markFound('H')}
-  className={`relative inline-block -ml-[0.45ch] mr-[0.20ch] align-[-0.34em] rotate-[-6deg] ${
+  className={`relative inline-block -ml-[0.42ch] -mr-[0.10ch] align-[-0.38em] rotate-[-6deg] ${
     debug ? 'outline outline-1 outline-fuchsia-500' : ''
   }`}
   title={debug ? 'Hidden H' : undefined}
