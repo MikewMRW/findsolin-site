@@ -274,30 +274,24 @@ function Landing() {
   <button
   aria-label="(Hidden) letter H"
   onClick={() => markFound('H')}
-  className={`inline-block align-baseline transition ${debug ? 'outline outline-1 outline-fuchsia-500' : ''}`}
+  className={`relative inline-block -ml-[0.35ch] -mr-[0.15ch] align-[-0.16em] rotate-[-6deg] ${
+    debug ? 'outline outline-1 outline-fuchsia-500' : ''
+  }`}
   title={debug ? 'Hidden H' : undefined}
 >
-  <span
-    className={`inline-block align-baseline ${!found.has('H') && !debug ? 'fs-blink' : ''}`}
-    aria-hidden="true"
-  >
-    {/* tighter to the T, tiny gap before the e, lower on baseline, slight tilt */}
-    <span className="relative inline-block -ml-3 mr-1 translate-y-[10px] rotate-[-5deg] align-baseline">
-      {/* responsive box so it can’t blow up */}
-      <span className="relative block w-[64px] h-[78px] md:w-[86px] md:h-[105px] lg:w-[96px] lg:h-[118px] drop-shadow-[0_6px_20px_rgba(0,0,0,0.55)]">
-        <Image
-          src="/hransom.png"
-          alt="Ransom letter H"
-          fill
-          sizes="(max-width: 768px) 64px, (max-width: 1024px) 86px, 96px"
-          style={{ objectFit: 'contain' }}
-          priority
-        />
-      </span>
-    </span>
+  <span className="relative block w-[76px] h-[92px] md:w-[96px] md:h-[116px] lg:w-[112px] lg:h-[136px] drop-shadow-[0_8px_22px_rgba(0,0,0,0.6)]">
+    <Image
+      src="/hransom.png"
+      alt="Ransom letter H"
+      fill
+      sizes="(max-width: 768px) 76px, (max-width: 1024px) 96px, 112px"
+      style={{ objectFit: 'contain' }}
+      priority
+    />
   </span>
   <span className="sr-only">h</span>
 </button>
+
 
 
   e adventure <span className="opacity-90">begins here.</span>
