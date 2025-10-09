@@ -274,23 +274,24 @@ function Landing() {
   <button
   aria-label="(Hidden) letter H"
   onClick={() => markFound('H')}
-  className={`relative inline-block -ml-[0.35ch] -mr-[0.15ch] align-[-0.16em] rotate-[-6deg] ${
+  className={`relative inline-block -ml-[0.65ch] -mr-[0.20ch] align-[-0.26em] rotate-[-7deg] ${
     debug ? 'outline outline-1 outline-fuchsia-500' : ''
   }`}
   title={debug ? 'Hidden H' : undefined}
 >
-  <span className="relative block w-[76px] h-[92px] md:w-[96px] md:h-[116px] lg:w-[112px] lg:h-[136px] drop-shadow-[0_8px_22px_rgba(0,0,0,0.6)]">
+  <span className="relative block w-[84px] h-[100px] md:w-[104px] md:h-[124px] lg:w-[116px] lg:h-[138px] drop-shadow-[0_10px_26px_rgba(0,0,0,0.6)]">
     <Image
       src="/hransom.png"
       alt="Ransom letter H"
       fill
-      sizes="(max-width: 768px) 76px, (max-width: 1024px) 96px, 112px"
+      sizes="(max-width: 768px) 84px, (max-width: 1024px) 104px, 116px"
       style={{ objectFit: 'contain' }}
       priority
     />
   </span>
   <span className="sr-only">h</span>
 </button>
+
 
 
 
